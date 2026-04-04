@@ -1,0 +1,1 @@
+packageSearchIndex = [{"l":"All Packages","u":"allpackages-index.html"},{"l":"com.example.freelancer"},{"l":"com.example.freelancer.controller"},{"l":"com.example.freelancer.exception"},{"l":"com.example.freelancer.model"},{"l":"com.example.freelancer.repository"},{"l":"com.example.freelancer.service"}];updateSearchResults();

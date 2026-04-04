@@ -1,0 +1,6 @@
+com.example.freelancer
+com.example.freelancer.controller
+com.example.freelancer.exception
+com.example.freelancer.model
+com.example.freelancer.repository
+com.example.freelancer.service

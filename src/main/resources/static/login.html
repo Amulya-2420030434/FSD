@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<title>Freelancer Login</title>
+
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<style>
+
+body{
+font-family: Arial;
+background:#f4f6f9;
+margin:0;
+}
+
+header{
+background:#2c3e50;
+color:white;
+padding:20px;
+text-align:center;
+font-size:24px;
+}
+
+.login-container{
+width:350px;
+margin:100px auto;
+background:white;
+padding:30px;
+border-radius:8px;
+box-shadow:0 2px 8px rgba(0,0,0,0.2);
+text-align:center;
+}
+
+input{
+width:90%;
+padding:10px;
+margin:10px;
+border:1px solid #ccc;
+border-radius:5px;
+}
+
+button{
+padding:10px 15px;
+border:none;
+border-radius:5px;
+background:#3498db;
+color:white;
+cursor:pointer;
+width:95%;
+}
+
+button:hover{
+background:#2980b9;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<header>
+<i class="fa-solid fa-laptop-code"></i>
+Freelancer Project Management System
+</header>
+
+<div class="login-container">
+
+<h2><i class="fa-solid fa-user-lock"></i> Login</h2>
+
+<input id="username" placeholder="Username">
+<input id="password" type="password" placeholder="Password">
+
+<button onclick="login()">
+<i class="fa-solid fa-right-to-bracket"></i> Login
+</button>
+
+</div>
+
+<script>
+
+function login(){
+
+let username=document.getElementById("username").value;
+let password=document.getElementById("password").value;
+
+if(username=="admin" && password=="admin123"){
+
+window.location.href="index.html";
+
+}else{
+
+alert("Invalid Login");
+
+}
+
+}
+
+</script>
+
+</body>
+</html>

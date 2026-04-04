@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html>
+	<head>
+	<meta charset="UTF-8">
+	<title>Freelancer Management System</title>
+
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<style>
+
+body{
+font-family: Arial;
+margin:0;
+background:#f4f6f9;
+}
+
+header{
+background:#2c3e50;
+color:white;
+padding:20px;
+text-align:center;
+font-size:24px;
+}
+
+.container{
+width:90%;
+margin:auto;
+margin-top:30px;
+}
+
+.card{
+background:white;
+padding:20px;
+margin-bottom:20px;
+border-radius:8px;
+box-shadow:0 2px 8px rgba(0,0,0,0.1);
+}
+
+h2{
+margin-top:0;
+color:#2c3e50;
+}
+
+input{
+padding:10px;
+margin:5px;
+width:200px;
+border-radius:5px;
+border:1px solid #ccc;
+}
+
+button{
+padding:10px 15px;
+border:none;
+border-radius:5px;
+background:#3498db;
+color:white;
+cursor:pointer;
+font-size:14px;
+}
+
+button:hover{
+background:#2980b9;
+}
+
+.freelancer{
+background:white;
+padding:15px;
+margin:12px 0;
+border-radius:8px;
+border-left:5px solid #3498db;
+box-shadow:0 2px 6px rgba(0,0,0,0.08);
+font-size:15px;
+}
+
+.icon{
+margin-right:5px;
+}
+
+.stats{
+font-size:18px;
+color:#27ae60;
+}
+
+.star{
+font-size:22px;
+color:#ccc;
+cursor:pointer;
+transition:0.2s;
+}
+
+.star:hover{
+color:#f1c40f;
+transform:scale(1.2);
+}
+
+.star.active{
+color:#f1c40f;
+}
+
+
+
+
+</style>
+</head>
+
+<body>
+
+<header>
+<i class="fa-solid fa-laptop-code"></i>
+Freelancer Project Management System
+</header>
+
+<div class="container">
+
+<!-- ADD FREELANCER -->
+
+<div class="card">
+<h2><i class="fa-solid fa-user-plus icon"></i>Add Freelancer</h2>
+
+<input id="name" placeholder="Name">
+<input id="skill" placeholder="Skill">
+<input id="email" placeholder="Email">
+<input id="experience" placeholder="Experience">
+
+<button onclick="addFreelancer()">
+<i class="fa-solid fa-plus"></i> Add
+</button>
+</div>
+
+
+<!-- SEARCH -->
+
+<div class="card">
+<h2><i class="fa-solid fa-search icon"></i>Search Freelancer by Skill</h2>
+
+<input id="searchSkill" placeholder="Enter skill">
+
+<button onclick="searchFreelancer()">
+<i class="fa-solid fa-magnifying-glass"></i> Search
+</button>
+
+<div id="searchResults"></div>
+
+</div>
+
+
+<!-- VIEW FREELANCERS -->
+
+<div class="card">
+<h2><i class="fa-solid fa-users icon"></i>All Freelancers</h2>
+
+<button onclick="loadFreelancers()">
+<i class="fa-solid fa-rotate"></i> Load Freelancers
+</button>
+
+<div id="freelancerList"></div>
+
+</div>
+
+
+<!-- ANALYTICS -->
+
+<div class="card">
+<h2><i class="fa-solid fa-chart-line icon"></i>Analytics</h2>
+
+<button onclick="loadStats()">
+<i class="fa-solid fa-chart-pie"></i> Show Stats
+</button>
+
+<div id="stats" class="stats"></div>
+
+</div>
+
+</div>
+
+
+<script>
+
+const baseUrl = "http://localhost:8081/freelancers";
+
+function addFreelancer(){
+
+let name=document.getElementById("name").value;
+let skill=document.getElementById("skill").value;
+let email=document.getElementById("email").value;
+let experience=document.getElementById("experience").value;
+
+if(name=="" || skill=="" || email=="" || experience==""){
+alert("Please fill all fields");
+return;
+}
+
+let data={
+name:name,
+skill:skill,
+email:email,
+experience:parseInt(experience)
+};
+
+fetch(baseUrl,{
+method:"POST",
+headers:{
+"Content-Type":"application/json"
+},
+body:JSON.stringify(data)
+})
+.then(response=>{
+
+if(response.ok){
+alert("Freelancer Added Successfully!");
+
+document.getElementById("name").value="";
+document.getElementById("skill").value="";
+document.getElementById("email").value="";
+document.getElementById("experience").value="";
+
+loadFreelancers();
+
+}else{
+alert("Error adding freelancer");
+}
+
+})
+.catch(error=>{
+console.error(error);
+alert("Server connection error");
+});
+
+}
+
+
+function loadFreelancers(){
+
+fetch(baseUrl)
+.then(res=>res.json())
+.then(data=>{
+
+let html="";
+
+data.forEach(f=>{
+
+let resumeButton="";
+
+if(f.resumeFile){
+resumeButton = `
+<button onclick="downloadResume('${f.resumeFile}')">
+<i class="fa-solid fa-file"></i> Resume
+</button>
+`;
+}
+
+html+=`
+<div class="freelancer">
+
+<b>${f.name}</b> | ${f.skill} | ${f.email ? f.email : "No Email"} | Experience: ${f.experience}
+<button onclick="deleteFreelancer(${f.id})">
+<i class="fa-solid fa-trash"></i> Delete
+</button>
+<br><br>
+
+<div>
+${[1,2,3,4,5].map(i => `
+<span class="star ${f.rating >= i ? 'active' : ''}" 
+onclick="rateFreelancer(${f.id},${i})">★</span>
+`).join('')}
+</div>
+
+${resumeButton}
+
+</div>
+`;
+
+});
+
+document.getElementById("freelancerList").innerHTML=html;
+
+});
+
+}
+//}
+
+
+function searchFreelancer(){
+
+let skill=document.getElementById("searchSkill").value;
+
+fetch(baseUrl+"/skill/"+skill)
+.then(res=>res.json())
+.then(data=>{
+
+let html="";
+
+data.forEach(f=>{
+
+html+=`
+<div class="freelancer">
+<b>${f.name}</b> | ${f.skill} | ${f.email}
+</div>
+`;
+
+});
+
+document.getElementById("searchResults").innerHTML=html;
+
+});
+
+}
+
+
+function loadStats(){
+
+fetch(baseUrl+"/stats")
+.then(res=>res.json())
+.then(data=>{
+
+document.getElementById("stats").innerHTML=
+"Total Freelancers: "+data.totalFreelancers+
+"<br>Average Experience: "+data.averageExperience;
+
+});
+
+}
+
+function downloadResume(filename){
+
+let encodedFile = encodeURIComponent(filename);
+
+window.open("http://localhost:8081/freelancers/resume/" + encodedFile);
+
+}
+
+
+
+function rateFreelancer(id,rating){
+
+fetch("http://localhost:8081/freelancers/rate/"+id+"?rating="+rating,{
+method:"PUT"
+})
+.then(res=>res.json())
+.then(data=>{
+alert("Rating Submitted");
+loadFreelancers();
+});
+
+}
+
+function showStars(rating){
+
+if(!rating) return "Not Rated";
+
+let fullStars = Math.floor(rating);
+let stars = "";
+
+for(let i=0;i<fullStars;i++){
+stars += "★";
+}
+
+for(let i=fullStars;i<5;i++){
+stars += "☆";
+}
+
+return stars + " (" + rating + ")";
+}
+
+function deleteFreelancer(id){
+
+if(!confirm("Delete this freelancer?")) return;
+
+fetch(baseUrl+"/"+id,{
+method:"DELETE"
+})
+.then(res=>res.text())
+.then(data=>{
+alert(data);
+loadFreelancers();
+});
+
+}
+
+window.onload = loadFreelancers;
+</script>
+
+</body>
+</html>
